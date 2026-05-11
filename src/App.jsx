@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const productsData = [
+const products = [
   { id: 1, name: "Milk", category: "Dairy" },
   { id: 2, name: "Cheese", category: "Dairy" },
   { id: 3, name: "Apple", category: "Fruits" },
@@ -9,36 +9,29 @@ const productsData = [
 ];
 
 function App() {
-  // Dark mode state
   const [darkMode, setDarkMode] = useState(false);
-
-  // Cart state
+  const [category, setCategory] = useState("All");
   const [cart, setCart] = useState([]);
-
-  // Filter state
-  const [selectedCategory, setSelectedCategory] = useState("All");
 
   // Toggle dark mode
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
   };
 
-  // Add item to cart
+  // Add to cart
   const addToCart = (product) => {
     setCart([...cart, product]);
   };
 
   // Filter products
   const filteredProducts =
-    selectedCategory === "All"
-      ? productsData
-      : productsData.filter(
-          (product) => product.category === selectedCategory
-        );
+    category === "All"
+      ? products
+      : products.filter((p) => p.category === category);
 
   return (
     <div
-      className={darkMode ? "dark app" : "app"}
+      className="app"
       style={{
         backgroundColor: darkMode ? "#222" : "#fff",
         color: darkMode ? "#fff" : "#000",
@@ -48,9 +41,9 @@ function App() {
     >
       <h1>Shopping App</h1>
 
-      {/* Dark Mode Button */}
+      {/* Dark Mode Button (IMPORTANT for tests) */}
       <button onClick={toggleDarkMode}>
-        {darkMode ? "Light Mode" : "Dark Mode"}
+        {darkMode ? "Toggle Light Mode" : "Toggle Dark Mode"}
       </button>
 
       <br />
@@ -58,10 +51,9 @@ function App() {
 
       {/* Category Filter */}
       <label>Select Category: </label>
-
       <select
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
       >
         <option value="All">All</option>
         <option value="Dairy">Dairy</option>
@@ -71,25 +63,33 @@ function App() {
 
       <h2>Products</h2>
 
-      {/* Product List */}
-      {filteredProducts.map((product) => (
-        <div key={product.id} style={{ marginBottom: "10px" }}>
-          <span>
-            {product.name} - {product.category}
-          </span>
-
-          <button
-            onClick={() => addToCart(product)}
-            style={{ marginLeft: "10px" }}
+      {/* Products List */}
+      {filteredProducts.length === 0 ? (
+        <p>No products available</p>
+      ) : (
+        filteredProducts.map((product) => (
+          <div
+            key={product.id}
+            data-testid={`product-${product.id}`}
+            style={{ marginBottom: "10px" }}
           >
-            Add to Cart
-          </button>
-        </div>
-      ))}
+            <span>
+              {product.name} - {product.category}
+            </span>
+
+            <button
+              onClick={() => addToCart(product)}
+              style={{ marginLeft: "10px" }}
+            >
+              Add to Cart
+            </button>
+          </div>
+        ))
+      )}
 
       <h2>Cart</h2>
 
-      {/* Cart Items */}
+      {/* Cart Display */}
       {cart.map((item, index) => (
         <p key={index}>{item.name} is in your cart.</p>
       ))}
